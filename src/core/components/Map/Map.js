@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 
+import apiFetch from '@wordpress/api-fetch';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -20,6 +21,14 @@ const Map = (props) => {
 	const mapContainer = useRef(null);
 	const map = useRef(null);
 	const [mapReady, setMapReady] = useState(false);
+	const [posts, setPosts] = useState([]);
+
+	useEffect(() => {
+		apiFetch({ path: '/wp-json/wp/v2/person' }).then((response) => {
+			console.log(response);
+			setPosts(response);
+		});
+	}, []);
 
 	useEffect(() => {
 		if (map.current || !mapboxToken) return;
@@ -46,6 +55,41 @@ const Map = (props) => {
 			const bearing = map.current.getBearing();
 
 			updateCallback({ longitude, latitude, zoom, pitch, bearing });
+		});
+
+		map.current.on('load', function() {
+			map.current.addLayer(
+			  	{
+					id: 'country-boundaries',
+					source: {
+						type: 'vector',
+						url: 'mapbox://mapbox.country-boundaries-v1',
+					},
+					'source-layer': 'country_boundaries',
+					type: 'fill',
+					paint: {
+						'fill-color': '#d2361e',
+						'fill-opacity': 0.4,
+					},
+			  	},
+			  'country-label'
+			);
+
+			map.current.setFilter('country-boundaries', [
+				"in",
+				"iso_3166_1_alpha_3",
+				'NLD',
+				'ITA'
+			]);
+		});
+
+		map.current.on('click', function(e) {
+			const features = map.current.queryRenderedFeatures(e.point, { layers: ['country-boundaries'] });
+		
+			if (features.length > 0) {
+				const clickedCountry = features[0].properties.name;
+				console.log(clickedCountry, features[0].properties);
+			}
 		});
 
 		setMapReady(true);

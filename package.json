@@ -12,9 +12,13 @@
 		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start"
+		"start": "wp-scripts start",
+		"bundle": "dir-archiver --src . --dest ../chirp-mapbox.zip --exclude .DS_Store .stylelintrc.json .eslintrc .git .gitattributes .github .gitignore README.md composer.json composer.lock node_modules **/node_modules package-lock.json package.json .travis.yml phpcs.xml.dist sass style.css.map gulpfile.js **/**/src **/**/node_modules **/**/package-lock.json **/**/package.json"
 	},
 	"dependencies": {
+		"@wordpress/api-fetch": "^6.52.0",
+		"@wordpress/data": "^9.25.0",
+		"dir-archiver": "^2.1.0",
 		"mapbox-gl": "^2.14.0",
 		"react": "^18.2.0"
 	},
